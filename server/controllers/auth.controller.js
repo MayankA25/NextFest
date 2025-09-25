@@ -496,3 +496,18 @@ export const resetPassword = async (req, res) => {
     return res.status(500).json({ msg: "Internal Sever Error" });
   }
 };
+
+export const uploadResume = async(req, res)=>{
+  const { id, resumeUrl } = req.body;
+
+  try{
+    const updatedUser = await User.findByIdAndUpdate(id, {
+      resume: resumeUrl
+    }, {new: true});
+
+    return res.status(200).json({ updatedser: updatedUser });
+  }catch(e){
+    console.log(e);
+    return res.status(500).json({ msg: "Internal Server Error" })
+  }
+}

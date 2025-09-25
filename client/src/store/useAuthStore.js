@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { toast } from "react-hot-toast";
 import { axiosInstance } from "../lib/axios.js";
 import { checkEmailValidity } from "../../utils/checkEmail.js";
+import { uploadFiles } from "../../utils/uploadFile.js";
 
 const BASE_URL = "http://localhost:5000/api";
 
@@ -297,5 +298,35 @@ export const useAuthStore = create((set, get) => ({
 
   setUser: async(userObj)=>{
     set({ user: userObj });
+  },
+
+  uploadResume: async(formData)=>{
+    try{
+      // const response;
+      const urls = await uploadFiles(formData);
+      console.log("URLs: ", urls);
+      set({ user: { ...get().user, resume: urls[0] } });
+      const response = await axiosInstance.post("/auth/uploadresume", {
+        id: get().user._id,
+        resumeUrl: urls[0]
+      });
+      console.log(response.data);
+    }catch(e){
+      console.log(e);
+    }
+  },
+
+  deleteResume: async()=>{
+    try{
+      set({ user: { ...get().user, resume: "" } });
+      const response = await axiosInstance.post("/auth/uploadresume", {
+        id: get().user._id,
+        resumeUrl:""
+      });
+      console.log(response.data);
+      toast.success("Deleted Resume");
+    }catch(e){
+      console.log(e);
+    }
   }
 }));

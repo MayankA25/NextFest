@@ -17,6 +17,7 @@ import {
   resetPassword,
   sendOTP,
   submitForm,
+  uploadResume,
   verifyotp,
 } from "../controllers/auth.controller.js";
 import "../strategies/google-strategy.js";
@@ -81,5 +82,6 @@ authRouter.put("/submitform", submitForm);
 authRouter.post("/logout",verifyToken, logout);
 authRouter.post("/resetpassword", resetPassword);
 authRouter.get("/getallusers", verifyToken, getAllUsers);
+authRouter.post("/uploadresume", verifyToken, uploadResume)
 
 export default authRouter;

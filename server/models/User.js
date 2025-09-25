@@ -59,6 +59,10 @@ const userSchema = new Schema({
         linkedAt: { 
             type: Date
          }
+    },
+    resume: {
+        type: String,
+        default: ""
     }
 }, {timestamps: true});
 

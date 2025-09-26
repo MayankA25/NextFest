@@ -79,7 +79,7 @@ export const useFormStore = create((set, get) => ({
       return toast.success("Form Submitted");
     }catch(e){
       console.log(e);
-      return toast.error("Error While Submitting Form");
+      return toast.error(e.response.data.msg);
     }
   },
 

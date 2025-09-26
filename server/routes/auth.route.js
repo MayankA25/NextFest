@@ -17,6 +17,7 @@ import {
   resetPassword,
   sendOTP,
   submitForm,
+  updateProfilePicture,
   uploadResume,
   verifyotp,
 } from "../controllers/auth.controller.js";
@@ -82,6 +83,7 @@ authRouter.put("/submitform", submitForm);
 authRouter.post("/logout",verifyToken, logout);
 authRouter.post("/resetpassword", resetPassword);
 authRouter.get("/getallusers", verifyToken, getAllUsers);
-authRouter.post("/uploadresume", verifyToken, uploadResume)
+authRouter.post("/uploadresume", verifyToken, uploadResume);
+authRouter.post("/updateprofilepicture", verifyToken, updateProfilePicture);
 
 export default authRouter;

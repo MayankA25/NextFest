@@ -6,6 +6,7 @@ import { connection } from "../utils/redis.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import { validatePhoneNumber } from "../utils/phone.mjs";
 
 dotenv.config({ path: "D:\\Mayank Data\\CODING\\NextFest\\server\\.env" });
 
@@ -93,7 +94,7 @@ export const getUser = async (req, res) => {
       .status(200)
       .json({ authenticated: true, user: foundUser });
   } catch (e) {
-    console.log("Error While Getting User: ", e);
+    // console.log("Error While Getting User: ", e);
     return res
       .status(401)
       .json({ msg: "Internal Server Error", authenticated: false });
@@ -357,7 +358,7 @@ export const refreshToken = async (req, res) => {
       })
     return res
     .status(401)
-    .json({ msg: "Unauthenticated", authenticated: false });
+    .json({ msg: "Unauthenticated(Token Not Found)", authenticated: false });
   }
 
   try {
@@ -385,7 +386,7 @@ export const refreshToken = async (req, res) => {
       })
       return res
       .status(401)
-      .json({ msg: "Unauthenticated", authenticated: false });
+      .json({ msg: "Unauthenticated(User Not Found)", authenticated: false });
     }
 
     const newAccessToken = jwt.sign(
@@ -403,10 +404,22 @@ export const refreshToken = async (req, res) => {
     });
     return res.status(200).json({ user: foundUser, authenticated: true });
   } catch (e) {
-    // console.log(e);
+    // console.log(e.name);
+    if(e.name == "TokenExpiredError"){
+      res.clearCookie("accessToken", {
+        httpOnly: true,
+        secure: false,
+        samesite: "strict"
+      });
+      res.clearCookie("refreshToken", {
+        httpOnly: true,
+        secure:false,
+        samesite: "strict"
+      })
+    }
     return res
       .status(401)
-      .json({ msg: "Unauthenticated", authenticated: false });
+      .json({ msg: "Unauthenticated(Error Occurred)", authenticated: false });
   }
 };
 
@@ -417,6 +430,13 @@ export const submitForm = async (req, res) => {
     console.log(phoneNumber);
     console.log(regNo);
     console.log(interests);
+
+    const validPhone = validatePhoneNumber(phoneNumber);
+
+    console.log("Valid Phone: ", validPhone);
+
+    if(!validPhone) return res.status(400).json({ msg: "Invalid Phone Number" });
+
     const updatedUser = await User.findByIdAndUpdate(
       id,
       {
@@ -436,7 +456,7 @@ export const submitForm = async (req, res) => {
     console.log("Updated User: ", updatedUser);
     return res.status(200).json({ updatedUser: updatedUser });
   } catch (e) {
-    console.log(e);
+    // console.log(e);
     return res.status(500).json({ msg: "Internal Server Error" });
   }
 };
@@ -510,4 +530,21 @@ export const uploadResume = async(req, res)=>{
     console.log(e);
     return res.status(500).json({ msg: "Internal Server Error" })
   }
+}
+
+
+export const updateProfilePicture = async(req, res)=>{
+  const { id, profilePic } = req.body;
+
+  try{
+    const updatedUser = await User.findByIdAndUpdate(id, {
+      profilePic: profilePic
+    });
+    console.log("Updated User: ", updatedUser);
+    return res.status(200).json({ msg: "Profile Picture Updated", updatedUser: updatedUser });
+  }catch(e){
+    console.log(e);
+    return res.status(500).json({ msg:"Internal Server Error" })
+  }
+
 }

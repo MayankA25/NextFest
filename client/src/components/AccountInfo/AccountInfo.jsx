@@ -20,29 +20,31 @@ import { useLinkStore } from "../../store/useLinkingStore";
 import toast from "react-hot-toast";
 
 export default function AccountInfo() {
-  const { user, uploadResume, deleteResume } = useAuthStore();
+  const { user, uploadResume, deleteResume, uploadProfilePicture } =
+    useAuthStore();
   const { linkGoogleAccount } = useLinkStore();
   const [hover, setHover] = useState(false);
   const ref = useRef(null);
   const ref2 = useRef(null);
 
-
-  const handleResumeUpload = async(e)=>{
+  const handleResumeUpload = async (e) => {
     const file = e.target.files[0];
-    if(!file) return;
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("files", file);
+    uploadResume(formData);
+  };
+
+  const handleProfileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
 
     const formData = new FormData();
     formData.append("files", file);
 
-    toast.promise(async()=>{
-      uploadResume(formData);
-    }, {
-      loading: "Uploading...",
-      success: "Uploaded",
-      error: "Error While Uploading"
-    })
-
-  }
+    uploadProfilePicture(formData);
+  };
 
   return (
     <div className="flex flex-col justify-center">
@@ -59,54 +61,85 @@ export default function AccountInfo() {
         </div>
       </div>
       <hr className="my-10 text-white/20" />
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-5">
-          <div
-            className="flex items-center justify-center relative"
-            onMouseOver={() => setHover(true)}
-            onMouseOut={() => setHover(false)}
-            onClick={() => {
-              ref.current.click();
-            }}
-          >
-            <div className="flex flex-col justify-center relative">
-              <img
-                src={user?.profilePic || DefaultProfile}
-                className="w-30 h-30 rounded-full object-contain bg-[#222]"
-              />
-              {/* {<div className="flex items-center gap-1 absolute -bottom-10">
+      <div className="flex flex-col">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-5">
+            <div
+              className="flex items-center justify-center relative"
+              onMouseOver={() => setHover(true)}
+              onMouseOut={() => setHover(false)}
+              onClick={() => {
+                ref.current.click();
+              }}
+            >
+              <div className="flex flex-col justify-center relative">
+                <img
+                  src={user?.profilePic || DefaultProfile}
+                  className="w-30 h-30 rounded-full object-contain bg-[#222]"
+                />
+                {/* {<div className="flex items-center gap-1 absolute -bottom-10">
                 <Loader2 className="animate-spin"/>
                 <h1>Updating</h1>
-              </div>} */}
-            </div>
-            {
-              <div
-                className={`flex items-center justify-center absolute w-full h-full bg-white/10 rounded-full backdrop-blur-lg ${
-                  !hover && "opacity-0"
-                } transition-all duration-200 cursor-pointer`}
-              >
-                <Pen />
+                </div>} */}
               </div>
-            }
-            <input ref={ref} type="file" className="hidden" />
+              {
+                <div
+                  className={`flex items-center justify-center absolute w-full h-full bg-white/10 rounded-full backdrop-blur-lg ${
+                    !hover && "opacity-0"
+                  } transition-all duration-200 cursor-pointer`}
+                >
+                  <Pen />
+                </div>
+              }
+              <input
+                ref={ref}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleProfileChange}
+              />
+            </div>
+            <div className="flex flex-col justify-center gap-2">
+              <h1 className="text-4xl">
+                {user?.firstName} {user?.lastName}
+              </h1>
+              <h2 className="text-xl text-white/50">
+                {user?.role[0].toUpperCase()}
+                {user?.role.slice(1, user?.role.length)}
+              </h2>
+            </div>
           </div>
-          <div className="flex flex-col justify-center gap-2">
-            <h1 className="text-4xl">
-              {user?.firstName} {user?.lastName}
-            </h1>
-            <h2 className="text-xl text-white/50">
-              {user?.role[0].toUpperCase()}
-              {user?.role.slice(1, user?.role.length)}
-            </h2>
-          </div>
+          {!user?.googleDetails && (
+            <div
+              className="flex items-center gap-2 bg-white/10 hover:bg-white/15 cursor-pointer px-4 py-2 rounded-lg"
+              onClick={() => linkGoogleAccount()}
+            >
+              <Link />
+              <h1>Link Account</h1>
+            </div>
+          )}
+          {user?.googleDetails && (
+            <div className="flex items-center">
+              <h1>
+                Connected With:{" "}
+                <span className="ml-2">{user?.googleDetails.email}</span>
+              </h1>
+            </div>
+          )}
         </div>
-        {!user?.googleDetails && <div className="flex items-center gap-2 bg-white/10 hover:bg-white/15 cursor-pointer px-4 py-2 rounded-lg" onClick={()=>linkGoogleAccount()}>
-          <Link />
-          <h1>Link Account</h1>
-        </div>}
-        {user?.googleDetails && <div className="flex items-center">
-            <h1>Connected With: <span className="ml-2">{user?.googleDetails.email}</span></h1>
-            </div>}
+        {user?.interests && user?.interests[0]?.length != 0 && (
+          <div className=" mt-4 py-1 flex items-center gap-5">
+            <div className="flex items-center">
+              {user?.interests.map((interest, index) => {
+                return (
+                  <span className="flex items-center justify-center bg-[#333] hover:bg-[#444] cursor-default transition-all duration-200 px-4 py-1 rounded-full">
+                    {interest}
+                  </span>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
       <hr className="my-10 text-white/20" />
       <div className="flex flex-col justify-center gap-4">
@@ -162,10 +195,32 @@ export default function AccountInfo() {
       <div className="flex items-center justify-between my-10">
         <h1 className="text-xl">Upload Resume</h1>
         <div className="flex items-center justify-center gap-3 font-bold">
-          <input ref={ref2} type="file" className="hidden" onChange={handleResumeUpload}/>
-          <button onClick={()=>ref2.current.click()} className="btn bg-[#333]">{user?.resume?.length!=0 ? "Update" : "Upload Resume"}</button>
-          {user?.resume?.length != 0 && <button onClick={()=>deleteResume()} className="btn btn-error text-white">Delete</button>}
-          {user?.resume?.length != 0 && <a href={user?.resume} target="_blank" className="btn bg-[#444]"> Show Resume</a>}
+          <input
+            ref={ref2}
+            type="file"
+            className="hidden"
+            onChange={handleResumeUpload}
+          />
+          <button
+            onClick={() => ref2.current.click()}
+            className="btn bg-[#333]"
+          >
+            {user?.resume?.length != 0 ? "Update" : "Upload Resume"}
+          </button>
+          {user?.resume?.length != 0 && (
+            <button
+              onClick={() => deleteResume()}
+              className="btn btn-error text-white"
+            >
+              Delete
+            </button>
+          )}
+          {user?.resume?.length != 0 && (
+            <a href={user?.resume} target="_blank" className="btn bg-[#444]">
+              {" "}
+              Show Resume
+            </a>
+          )}
         </div>
       </div>
     </div>

@@ -1,10 +1,13 @@
-import { Loader, Loader2, Pen, Plus } from "lucide-react";
-import React, { useRef } from "react";
+import { Loader, Loader2, Pen, Phone, Plus } from "lucide-react";
+import React, { useEffect, useRef, useState } from "react";
 import { useFormStore } from "../../store/useFormStore";
 import { useAuthStore } from "../../store/useAuthStore";
 import { Suspense } from "react";
 import { lazy } from "react";
 import ProfilePicture from "../ProfilePicture/ProfilePicture";
+import PhoneInput from "react-phone-number-input";
+import "react-phone-number-input/style.css";
+import "./Form.css";
 
 const lazyComponent = lazy(() => import("../ProfilePicture/ProfilePicture"));
 
@@ -22,6 +25,13 @@ export default function Form() {
   const { user } = useAuthStore();
 
   const fileInputRef = useRef(null);
+
+  const [phone, setPhone] = useState("");
+
+  useEffect(()=>{
+    setFormDetails(setFormDetails({ phoneNumber:phone }))
+  }, [phone])
+
 
   const handleProfilePicUpload = async (e) => {
     const profilePic = e.target.files[0];
@@ -138,13 +148,20 @@ export default function Form() {
               Phone Number
               <span className="mx-1 text-red-400">*</span>
             </label>
-            <input
+            {/* <input
               id="phone"
               type="tel"
               value={formDetails.phoneNumber || ""}
               onChange={(e) => setFormDetails({ phoneNumber: e.target.value })}
               placeholder="Phone Number"
               className="p-2 py-3 border border-purple-400 rounded-md focus:bg-gray-900 focus:outline-none focus:border-2 focus:border-indigo-500"
+            /> */}
+            <PhoneInput
+              defaultCountry="IN"
+              className="custom-input"
+              placeholder="1234567890"
+              value={phone || ""}
+              onChange={setPhone}
             />
           </div>
           <div className="flex flex-col gap-3">
@@ -187,7 +204,7 @@ export default function Form() {
           </div>
           <div className="flex items-center justify-between my-3">
             <button
-              className="font-bold bg-pink-500 p-2 px-5 rounded-lg cursor-pointer hover:bg-indigo-600 hover:scale-103 transiiton-all duration-300"
+              className="font-bold bg-pink-500 px-5 py-1.5 rounded-md cursor-pointer hover:bg-indigo-600 hover:scale-103 transiiton-all duration-300"
               onClick={() => submitForm()}
             >
               Save

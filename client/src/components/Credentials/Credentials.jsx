@@ -127,9 +127,9 @@ export default function Credentials() {
           <hr className=" h-0.5 w-[50%]" />
         </div>
         <div className="flex items-center w-[80%]" onClick={() => login()}>
-          <div className="flex items-center justify-center py-3.5 rounded-lg px-7 gap-5 border-2 border-gray-300 shadow-xl mx-auto w-full cursor-pointer hover:scale-102 transition-all duration-200">
-            <img src="./google_img.webp" className="w-7" alt="" />
-            <p>Login With Google</p>
+          <div className="flex items-center justify-center py-3.5 rounded-lg px-7 gap-5 border-2 border-gray-400/35 shadow-xl mx-auto w-full cursor-pointer hover:scale-102 transition-all duration-200">
+            <img src="./google_img.jpg" className="w-7" alt="" />
+            <p>Continue With Google</p>
           </div>
         </div>
       </div>

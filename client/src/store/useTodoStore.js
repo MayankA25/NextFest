@@ -332,7 +332,7 @@ export const useTodoStore = create((set, get) => ({
     const tempTodos = [...get().originalTodos];
     
     const dueTodayTodos = tempTodos.filter((todo, index)=>{
-      return new Date(todo.deadline)- new Date() < 24 * 60 * 60 * 1000
+      return new Date(todo.deadline).getDate() == new Date().getDate() && new Date(todo.deadline).getMonth() == new Date().getMonth() && new Date(todo.deadline).getFullYear() == new Date().getFullYear()
     });
 
     set({ todos: dueTodayTodos });

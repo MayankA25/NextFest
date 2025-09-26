@@ -303,14 +303,21 @@ export const useAuthStore = create((set, get) => ({
   uploadResume: async(formData)=>{
     try{
       // const response;
-      const urls = await uploadFiles(formData);
-      console.log("URLs: ", urls);
-      set({ user: { ...get().user, resume: urls[0] } });
-      const response = await axiosInstance.post("/auth/uploadresume", {
-        id: get().user._id,
-        resumeUrl: urls[0]
-      });
-      console.log(response.data);
+      toast.promise(async ()=>{
+
+        const urls = await uploadFiles(formData);
+        console.log("URLs: ", urls);
+        set({ user: { ...get().user, resume: urls[0] } });
+        const response = await axiosInstance.post("/auth/uploadresume", {
+          id: get().user._id,
+          resumeUrl: urls[0]
+        });
+        console.log(response.data);
+      }, {
+        loading: "Uploading",
+        error: "Error While Uploading",
+        success: "Uploaded"
+      })
     }catch(e){
       console.log(e);
     }
@@ -328,5 +335,28 @@ export const useAuthStore = create((set, get) => ({
     }catch(e){
       console.log(e);
     }
+  },
+
+  uploadProfilePicture: async(formData)=>{
+    toast.promise(async ()=>{
+
+      const urls = await uploadFiles(formData);
+      console.log("URLs: ", urls);
+      set({ user: { ...get().user, profilePic: urls[0] } });
+      try{
+        const response = await axiosInstance.post("/auth/updateprofilepicture", {
+          id: get().user._id,
+          profilePic: urls[0]
+        });
+        console.log(response.data);
+        // toast.success("Updated Profile Picture");
+      }catch(e){
+        console.log(e);
+      }
+    }, {
+      loading: "Uploading",
+      success: "Profile Updated",
+      error: "Error While Updating Profile"
+    })
   }
 }));

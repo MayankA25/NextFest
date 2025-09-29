@@ -11,6 +11,7 @@ import React, { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { useAuthStore } from "../../store/useAuthStore";
 import { useNavigate } from "react-router-dom";
+import DefaultProfile from "../../../public/default_profile_2.jpg";
 
 export default function Sidebar() {
 
@@ -128,7 +129,7 @@ export default function Sidebar() {
         <div className="flex items-center justify-between absolute bottom-0 py-2 w-full px-2">
           <div className="flex items-center gap-2 relative w-full p-6">
             <img
-              src={user?.profilePic || ""}
+              src={user?.profilePic || DefaultProfile}
               alt=""
               className={`bg-white rounded-full object-contain w-10 h-10 absolute left-0 ${
                 !hover && " left-0"

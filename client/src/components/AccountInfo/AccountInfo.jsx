@@ -18,10 +18,13 @@ import { useRef } from "react";
 import DefaultProfile from "../../../public/default_profile_2.jpg";
 import { useLinkStore } from "../../store/useLinkingStore";
 import toast from "react-hot-toast";
+import EditAccountInfo from "../EditAccountInfo/EditAccountInfo";
+import { useAccountStoreInfo } from "../../store/useAccountInfoStore";
 
 export default function AccountInfo() {
   const { user, uploadResume, deleteResume, uploadProfilePicture } =
     useAuthStore();
+  const { setAccountDetails, setInterestCount } = useAccountStoreInfo();
   const { linkGoogleAccount } = useLinkStore();
   const [hover, setHover] = useState(false);
   const ref = useRef(null);
@@ -50,12 +53,15 @@ export default function AccountInfo() {
     <div className="flex flex-col justify-center">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="flex items-center justify-center hover:bg-white/15 cursor-pointer p-1.5 rounded-full">
+          <div className="flex items-center justify-center hover:bg-white/15 cursor-pointer p-1.5 rounded-full transition-all duration-200">
             <ArrowLeft className="size-5" />
           </div>
           <h1 className="text-xl">Your Account</h1>
         </div>
-        <div className="flex items-center justify-center gap-2 bg-white/20 hover:bg-white/25 transition-all duration-200 cursor-pointer px-4 py-1.5 rounded-lg">
+        <EditAccountInfo/>
+        <div className="flex items-center justify-center gap-2 bg-white/10 hover:bg-white/15 transition-all duration-200 cursor-pointer px-4 py-1.5 rounded-lg" 
+        onMouseOver={()=>{setAccountDetails({ firstName: user?.firstName, lastName: user?.lastName, email: user?.email, phone: user?.phone, interests: [...user?.interests, ''] }); setInterestCount(user?.interests.length+1)}}
+        onClick={()=>document.getElementById("my_edit_account_info_modal").showModal()}>
           <Pen className="size-4.5" />
           <h1>Edit</h1>
         </div>
@@ -129,10 +135,10 @@ export default function AccountInfo() {
         </div>
         {user?.interests && user?.interests[0]?.length != 0 && (
           <div className=" mt-4 py-1 flex items-center gap-5">
-            <div className="flex items-center">
+            <div className="grid grid-cols-5 gap-4 items-center">
               {user?.interests.map((interest, index) => {
                 return (
-                  <span className="flex items-center justify-center bg-[#333] hover:bg-[#444] cursor-default transition-all duration-200 px-4 py-1 rounded-full">
+                  <span key={index} className="flex items-center justify-center bg-[#333] hover:bg-[#444] cursor-default transition-all duration-200 px-4 py-1 text-sm rounded-full">
                     {interest}
                   </span>
                 );
@@ -168,7 +174,7 @@ export default function AccountInfo() {
           <h1 className="text-xl">Location </h1>
           <div className="flex items-center gap-3">
             <MapPin className="size-5" />
-            <h1>Sydney, Australia</h1>
+            <h1>{user?.state}, {user?.country}</h1>
           </div>
         </div>
       </div>

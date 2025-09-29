@@ -63,6 +63,12 @@ const userSchema = new Schema({
     resume: {
         type: String,
         default: ""
+    },
+    state: {
+        type: String
+    },
+    country: {
+        type: String
     }
 }, {timestamps: true});
 

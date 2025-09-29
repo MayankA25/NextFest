@@ -6,6 +6,10 @@ export const useTimeSlotStore = create((set, get)=>({
     weekDays: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
     monthDays: [31, 30, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
 
+    currentMonth: new Date().getMonth(),
+    nextMonth: new Date().getMonth(),
+    nextMonthIndex: 3,
+
     getWeekDates: async()=>{
 
         const tempWeekDates = [];
@@ -25,7 +29,7 @@ export const useTimeSlotStore = create((set, get)=>({
         let currentDate2 = date.getDate();
 
         while(currentDay2 < 6){
-            if(currentDate2 > get().monthDays[new Date().getMonth()]) currentDate2 = 1;
+            if(currentDate2 >= get().monthDays[new Date().getMonth()]){ currentDate2 = 0; set({ nextMonth: new Date().getMonth() + 2 })};
             currentDay2++;
             currentDate2++;
             tempWeekDates.push(currentDate2);

@@ -1,4 +1,4 @@
-import { Loader, Loader2, Pen, Phone, Plus } from "lucide-react";
+import { Loader, Loader2, Pen, Phone, Plus, X } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import { useFormStore } from "../../store/useFormStore";
 import { useAuthStore } from "../../store/useAuthStore";
@@ -8,6 +8,7 @@ import ProfilePicture from "../ProfilePicture/ProfilePicture";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import "./Form.css";
+import { Country, State } from "country-state-city";
 
 const lazyComponent = lazy(() => import("../ProfilePicture/ProfilePicture"));
 
@@ -20,6 +21,8 @@ export default function Form() {
     submitForm,
     uploadProfilePicture,
     updating,
+    selectedInterests,
+    removeInterests
   } = useFormStore();
   const { formDetails } = useFormStore();
   const { user } = useAuthStore();
@@ -28,10 +31,38 @@ export default function Form() {
 
   const [phone, setPhone] = useState("");
 
-  useEffect(()=>{
-    setFormDetails(setFormDetails({ phoneNumber:phone }))
-  }, [phone])
+  const countries = Country.getAllCountries();
 
+  const [country, setCountry] = useState(countries[0].isoCode);
+
+  const [states, setStates] = useState([])
+
+  const [selectedState, setSelectedState] = useState('');
+
+
+  useEffect(() => {
+    console.log("Countries: ", countries);
+  }, []);
+
+  useEffect(() => {
+    // setFormDetails(setFormDetails({ phoneNumber: phone }));
+    setFormDetails({ phoneNumber: phone });
+  }, [phone]);
+
+  useEffect(()=>{
+    console.log("Country: ", country);
+    const foundCountryIndex = countries.findIndex((countryElem, index)=>{
+      return countryElem.isoCode == country
+    })
+    setFormDetails({ country: countries[foundCountryIndex].name })
+    setStates(State.getStatesOfCountry(country));
+    setSelectedState(State.getStatesOfCountry(country)[0].name)
+    console.log("State: ", State.getStatesOfCountry(country));
+  }, [country])
+
+  useEffect(()=>{
+    setFormDetails({ state: selectedState })
+  }, [selectedState])
 
   const handleProfilePicUpload = async (e) => {
     const profilePic = e.target.files[0];
@@ -164,6 +195,42 @@ export default function Form() {
               onChange={setPhone}
             />
           </div>
+          <div className="flex items-center gap-10">
+            <div className="flex flex-col justify-center w-full gap-2">
+              <label htmlFor="country">Country</label>
+              <select
+                name="country"
+                id="country"
+                className="px-2 py-3 border border-purple-400 rounded-md focus:bg-gray-900 focus:outline-none focus:border-2 focus:border-indigo-500 w-full"
+                onChange={(e)=>{setCountry(e.target.value)}}
+              >
+                {countries.map((country, index)=>{
+                  return(
+                    <option key={index} value={country.isoCode}>
+                      {country.name}
+                    </option>
+                  )
+                })}
+              </select>
+            </div>
+            <div className="flex flex-col justify-center w-full gap-2">
+              <label htmlFor="state">State</label>
+              <select
+                name="state"
+                id="state"
+                className="px-2 py-3 border border-purple-400 rounded-md focus:bg-gray-900 focus:outline-none focus:border-2 focus:border-indigo-500 w-full"
+                onChange={(e)=>{setSelectedState(e.target.value)}}
+              >
+                {states.map((state, index)=>{
+                  return (
+                    <option key={index} value={state.name}>
+                      {state.name}
+                    </option>
+                  )
+                })}
+              </select>
+            </div>
+          </div>
           <div className="flex flex-col gap-3">
             <label htmlFor="interest" className="text-xl">
               Your Interests
@@ -179,6 +246,7 @@ export default function Form() {
                 <div key={index} className="flex items-center w-full gap-5">
                   <select
                     id="interest"
+                    value={selectedInterests[index]}
                     placeholder="Phone Number"
                     className="px-2 py-3 border border-purple-400 rounded-md focus:bg-gray-900 focus:outline-none focus:border-2 focus:border-indigo-500 w-full"
                     onChange={(e) => selectInterest(index, e.target.value)}
@@ -194,6 +262,9 @@ export default function Form() {
                       );
                     })}
                   </select>
+                  {index != interestCount-1 && <button className="bg-white/10 p-2 rounded-md hover:bg-white/15 transition-all duration-200 cursor-pointer" onClick={()=>{removeInterests(index)}}>
+                    <X className="size-5"/>
+                    </button>}
                   {/* {index == interestCount-1 && <button className="flex items-center justify-center px-3.5 py-2.5 bg-white/10 rounded-lg gap-1 cursor-pointer" onClick={()=>{setInterestCount(interestCount+1)}}>
                     <Plus className="size-5" />
                     <h1>Add</h1>

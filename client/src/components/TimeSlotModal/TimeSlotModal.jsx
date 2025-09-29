@@ -5,7 +5,7 @@ import { getStartDate } from "../../../utils/date";
 import toast from "react-hot-toast";
 
 export default function TimeSlotModal() {
-  const { getWeekDates, weekDates, weekDays } = useTimeSlotStore();
+  const { getWeekDates, weekDates, weekDays,  currentMonth, nextMonth, nextMonthIndex } = useTimeSlotStore();
 
   const { setTodoDetails, setEditTodoDetails, setTags } = useTodoStore();
 
@@ -25,8 +25,8 @@ export default function TimeSlotModal() {
                     {new Date().getDate() == date && (
                       <div className="w-[97%] h-0.5 bg-white rounded-3xl absolute top-1 left-0"></div>
                     )}
-                    <h1 className="text-3xl">{date}</h1>
-                    <h1 className="">{weekDays[index]}</h1>
+                    <h1 className={`${new Date().getDate() != date && "text-white/50" } text-3xl`}>{date}</h1>
+                    <h1 className={`${new Date().getDate() != date && "text-white/50" }`}>{weekDays[index]}</h1>
                   </div>
                 );
               })}
@@ -50,7 +50,7 @@ export default function TimeSlotModal() {
                             onClick={() => {
                               setTodoDetails({ startDate: getStartDate() });
                               const currentDate = new Date();
-                              const currentMonth = `${
+                              let currentMonth2 = `${
                                 currentDate.getMonth() + 1
                               }`.padStart(2, "0");
                               const newDate = `${date}`.padStart(2, "0");
@@ -59,8 +59,18 @@ export default function TimeSlotModal() {
                                 2,
                                 "0"
                               )}:00`;
+                              
+                              console.log("Current Month: ", currentMonth);
+                              console.log("Next Month: ", nextMonth);
 
-                              const formattedDateTime = `${fullYear}-${currentMonth}-${newDate}T${formattedTime}`;
+                              if(currentMonth != nextMonth && index >= nextMonthIndex){
+                                
+                                currentMonth2 = `${currentDate.getMonth() + 2}`;
+                              }
+
+                              const  formattedDateTime = `${fullYear}-${currentMonth2}-${newDate}T${formattedTime}`;
+
+                              console.log("FDT: ",formattedDateTime)
 
                               if (new Date(formattedDateTime) < new Date()) {
                                 return toast.error("Deadline Must Be Valid!");
@@ -93,7 +103,7 @@ export default function TimeSlotModal() {
                             className="flex items-center justify-center py-6 bg-[#333] rounded-xl hover:bg-[#444] transition-all duration-200 cursor-pointer"
                             onClick={() => {
                               const currentDate = new Date();
-                              const currentMonth = `${
+                              let currentMonth2 = `${
                                 currentDate.getMonth() + 1
                               }`.padStart(2, "0");
                               const newDate = `${date}`.padStart(2, "0");
@@ -103,7 +113,12 @@ export default function TimeSlotModal() {
                                 "0"
                               )}:30`;
 
-                              const formattedDateTime = `${fullYear}-${currentMonth}-${newDate}T${formattedTime}`;
+                              if(currentMonth != nextMonth && index >= nextMonthIndex){
+                                currentMonth2 = `${currentDate.getMonth() + 2}`;
+                              }
+
+
+                              const formattedDateTime = `${fullYear}-${currentMonth2}-${newDate}T${formattedTime}`;
 
                               if (new Date(formattedDateTime) < new Date()) {
                                 return toast.error("Deadline Must Be Valid!");

@@ -17,6 +17,7 @@ import {
   resetPassword,
   sendOTP,
   submitForm,
+  updateAccountDetails,
   updateProfilePicture,
   uploadResume,
   verifyotp,
@@ -80,6 +81,7 @@ authRouter.post("/signup", manualSignUp);
 authRouter.post("/login", manualLogin);
 authRouter.get("/refresh", refreshToken);
 authRouter.put("/submitform", submitForm);
+authRouter.put("/updateaccount", verifyToken, updateAccountDetails);
 authRouter.post("/logout",verifyToken, logout);
 authRouter.post("/resetpassword", resetPassword);
 authRouter.get("/getallusers", verifyToken, getAllUsers);

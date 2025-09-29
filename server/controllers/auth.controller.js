@@ -424,7 +424,7 @@ export const refreshToken = async (req, res) => {
 };
 
 export const submitForm = async (req, res) => {
-  const { id, phoneNumber, regNo, interests, profilePicture } = req.body;
+  const { id, phoneNumber, regNo, interests, profilePicture, state, country } = req.body;
   console.log("profilePic: ", profilePicture);
   try {
     console.log(phoneNumber);
@@ -445,6 +445,8 @@ export const submitForm = async (req, res) => {
         initialFormSubmitted: true,
         interests: interests,
         profilePic: profilePicture,
+        country: country,
+        state: state
       },
       { new: true }
     ).select("-password");
@@ -460,6 +462,29 @@ export const submitForm = async (req, res) => {
     return res.status(500).json({ msg: "Internal Server Error" });
   }
 };
+
+export const updateAccountDetails = async(req, res)=>{
+  const { id, firstName, lastName, phone, interests, state, country } = req.body;
+  
+  try{
+    const validPhone = validatePhoneNumber(phone);
+    console.log("Valid Phone: ", validPhone);
+
+    const updatedUser = await User.findByIdAndUpdate(id, {
+      firstName: firstName,
+      lastName: lastName,
+      phone: phone,
+      interests: interests,
+      state: state,
+      country: country
+    }, {new: true}).select("-password");
+
+    return res.status(200).json({ msg: "Account Details Updated", updatedUser: updatedUser })
+  }catch(e){
+    console.log(e);
+    return res.status(500).json({ msg: "Internal Server Error" })
+  }
+}
 
 // Destroying Session Of Current User
 export const logout = async (req, res) => {
